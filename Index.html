@@ -1,1 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rizky Ramadhan — Developer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg-1: #111118;
+    --bg-2: #18181f;
+    --white: #f0f0f5;
+    --white-dim: #a0a0b0;
+    --white-faint: #50505a;
+    --purple: #7b5ea7;
+    --purple-dim: #4a3768;
+    --purple-faint: #1e1730;
+    --purple-glow: rgba(123, 94, 167, 0.15);
+    --line: rgba(123, 94, 167, 0.14);
+    --line-w: rgba(240, 240, 245, 0.06);
+    --grid-color: rgba(123, 94, 167, 0.05);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* GRID BACKGROUND */
+  .grid-bg {
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--grid-color) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .grid-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 20%, rgba(123,94,167,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 80%, rgba(123,94,167,0.05) 0%, transparent 50%);
+  }
+
+  /* NOISE */
+  .noise {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 200;
+    opacity: 0.02;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 200px;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 48px;
+    border-bottom: 1px solid var(--line);
+    backdrop-filter: blur(16px);
+    background: rgba(10,10,15,0.8);
+    transition: transform 0.4s ease;
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 4px;
+    color: var(--white);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--purple); }
+  .nav-links { display: flex; gap: 40px; list-style: none; }
+  .nav-links a {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--white-faint);
+    text-decoration: none;
+    transition: color 0.3s;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: 0; right: 0;
+    height: 1px;
+    background: var(--purple);
+    transform: scaleX(0);
+    transition: transform 0.3s;
+  }
+  .nav-links a:hover { color: var(--white); }
+  .nav-links a:hover::after { transform: scaleX(1); }
+  .nav-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--white-faint);
+  }
+  .status-dot {
+    width: 6px; height: 6px;
+    background: var(--purple);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+    box-shadow: 0 0 8px var(--purple);
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--purple); }
+    50% { opacity: 0.4; box-shadow: 0 0 2px var(--purple); }
+  }
+
+  /* WRAPPER */
+  .wrapper { position: relative; z-index: 1; }
+
+  /* HERO */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 48px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--purple);
+    margin-bottom: 24px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 0.8s 0.3s forwards;
+  }
+  .hero-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(72px, 13vw, 200px);
+    line-height: 0.9;
+    letter-spacing: 2px;
+    overflow: hidden;
+    color: var(--white);
+  }
+  .hero-name .line {
+    display: block;
+    opacity: 0;
+    transform: translateY(100%);
+    animation: slideUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .hero-name .line:nth-child(1) { animation-delay: 0.4s; }
+  .hero-name .line:nth-child(2) {
+    animation-delay: 0.55s;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--purple-dim);
+  }
+  .hero-sub {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    margin-top: 32px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.9s forwards;
+  }
+  .hero-sub p {
+    font-size: 14px;
+    color: var(--white-dim);
+    font-weight: 300;
+    max-width: 400px;
+    line-height: 1.7;
+  }
+  .hero-line { flex: 1; height: 1px; background: var(--line); }
+  .hero-scroll {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--white-faint);
+    text-transform: uppercase;
+    writing-mode: vertical-rl;
+    position: absolute;
+    right: 48px;
+    bottom: 80px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .hero-scroll::before {
+    content: '';
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, var(--purple), transparent);
+    animation: lineGrow 1s 1.5s both;
+  }
+  @keyframes lineGrow { from { height: 0; } to { height: 60px; } }
+
+  .corner-tl, .corner-br {
+    position: absolute;
+    width: 80px; height: 80px;
+    pointer-events: none;
+    opacity: 0;
+    animation: fadeIn 0.6s 1.2s forwards;
+  }
+  .corner-tl { top: 100px; left: 48px; border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+  .corner-br { bottom: 80px; right: 80px; border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); }
+
+  /* SECTIONS */
+  section { padding: 120px 48px; position: relative; }
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--purple);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 64px;
+  }
+  .section-label::before { content: attr(data-num); color: var(--purple-dim); }
+  .section-label::after { content: ''; flex: 1; max-width: 60px; height: 1px; background: var(--purple-dim); }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(40px, 6vw, 80px);
+    line-height: 1;
+    letter-spacing: 2px;
+    color: var(--white);
+  }
+
+  /* ABOUT */
+  #about .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    margin-top: 60px;
+  }
+  .about-text p {
+    color: var(--white-dim);
+    font-size: 15px;
+    line-height: 1.9;
+    margin-bottom: 20px;
+    font-weight: 300;
+  }
+  .about-text p strong { color: var(--white); font-weight: 500; }
+  .about-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    height: fit-content;
+  }
+  .stat-box {
+    background: var(--bg);
+    padding: 32px 28px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+  .stat-box:hover { background: var(--bg-2); }
+  .stat-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--purple), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .stat-box:hover::before { opacity: 1; }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    line-height: 1;
+    color: var(--white);
+    display: block;
+  }
+  .stat-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--white-faint);
+    margin-top: 6px;
+    display: block;
+  }
+
+  /* SKILLS */
+  #skills { background: var(--bg-1); }
+  .skills-container {
+    margin-top: 60px;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+  .skill-category-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--purple);
+    padding: 16px 32px;
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .skill-category-label::before {
+    content: '';
+    width: 4px; height: 4px;
+    background: var(--purple);
+    transform: rotate(45deg);
+    box-shadow: 0 0 6px var(--purple);
+    flex-shrink: 0;
+  }
+  .skills-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1px;
+    background: var(--line);
+  }
+  .skill-item {
+    background: var(--bg);
+    padding: 28px 32px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.25s;
+  }
+  .skill-item:hover { background: var(--bg-2); }
+  .skill-item::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at var(--mx,50%) var(--my,50%), var(--purple-glow), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s;
+    pointer-events: none;
+  }
+  .skill-item:hover::after { opacity: 1; }
+  .skill-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+  .skill-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--white);
+    font-weight: 700;
+  }
+  .skill-level-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--purple);
+    border: 1px solid var(--purple-dim);
+    padding: 3px 8px;
+    background: var(--purple-faint);
+  }
+  .skill-bar-track {
+    height: 2px;
+    background: var(--bg-2);
+    overflow: hidden;
+  }
+  .skill-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--purple-dim), var(--purple));
+    width: 0%;
+    transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 0 8px var(--purple);
+  }
+  .skill-percent {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--white-faint);
+    margin-top: 8px;
+    display: block;
+  }
+  .skill-desc {
+    font-size: 11px;
+    color: var(--white-faint);
+    margin-top: 10px;
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  /* FRAMEWORKS */
+  #frameworks .frameworks-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    margin-top: 60px;
+  }
+  .framework-card {
+    background: var(--bg);
+    padding: 48px 36px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+  .framework-card:hover { background: var(--bg-2); }
+  .framework-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--purple), transparent);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .framework-card:hover::before { opacity: 1; }
+  .fc-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--purple);
+    border: 1px solid var(--purple-dim);
+    background: var(--purple-faint);
+    padding: 3px 8px;
+    display: inline-block;
+    margin-bottom: 24px;
+  }
+  .fc-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    line-height: 1;
+    letter-spacing: 2px;
+    color: var(--white);
+    margin-bottom: 16px;
+  }
+  .fc-desc {
+    font-size: 12px;
+    color: var(--white-dim);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+  .fc-proficiency {
+    margin-top: 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .fc-bar-track {
+    flex: 1;
+    height: 2px;
+    background: var(--bg-2);
+    overflow: hidden;
+  }
+  .fc-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--purple-dim), var(--purple));
+    width: 0%;
+    transition: width 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 0 6px var(--purple);
+  }
+  .fc-perc {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--purple);
+    min-width: 36px;
+    text-align: right;
+  }
+
+  /* TIMELINE */
+  #background { background: var(--bg-1); }
+  .timeline {
+    margin-top: 60px;
+    position: relative;
+    padding-left: 48px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 8px; bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--purple), transparent);
+  }
+  .timeline-item {
+    position: relative;
+    margin-bottom: 56px;
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: opacity 0.6s, transform 0.6s;
+  }
+  .timeline-item.visible { opacity: 1; transform: translateX(0); }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -52px; top: 8px;
+    width: 8px; height: 8px;
+    border: 1px solid var(--purple);
+    transform: rotate(45deg);
+    background: var(--bg);
+    box-shadow: 0 0 8px var(--purple-glow);
+  }
+  .timeline-year {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--purple);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .timeline-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 2px;
+    color: var(--white);
+    margin-bottom: 10px;
+  }
+  .timeline-body {
+    font-size: 13px;
+    color: var(--white-dim);
+    line-height: 1.8;
+    max-width: 600px;
+    font-weight: 300;
+  }
+
+  /* CONTACT */
+  #contact {
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    border-top: 1px solid var(--line);
+    position: relative;
+    overflow: hidden;
+  }
+  #contact::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 50%, rgba(123,94,167,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  #contact .section-label { justify-content: center; }
+  #contact .section-label::after { max-width: 60px; }
+  .contact-big {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(56px, 10vw, 140px);
+    line-height: 0.9;
+    letter-spacing: 3px;
+    color: var(--white);
+    margin: 24px 0 48px;
+  }
+  .contact-big em {
+    font-style: normal;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--purple-dim);
+  }
+  .contact-links {
+    display: flex;
+    justify-content: center;
+    gap: 2px;
+    flex-wrap: wrap;
+  }
+  .contact-link {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--white-faint);
+    text-decoration: none;
+    border: 1px solid var(--line);
+    padding: 14px 28px;
+    transition: background 0.25s, color 0.25s, border-color 0.25s, box-shadow 0.25s;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg);
+  }
+  .contact-link:hover {
+    background: var(--purple-faint);
+    color: var(--white);
+    border-color: var(--purple-dim);
+    box-shadow: 0 0 20px var(--purple-glow);
+  }
+  .contact-link .arrow { transition: transform 0.2s; }
+  .contact-link:hover .arrow { transform: translate(4px, -4px); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 20px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg);
+  }
+  footer p {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--white-faint);
+    text-transform: uppercase;
+  }
+  footer p span { color: var(--purple); }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+  @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { to { opacity: 1; } }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.8s, transform 0.8s;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 768px) {
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    #hero { padding: 0 24px 60px; }
+    section { padding: 80px 24px; }
+    #about .about-grid { grid-template-columns: 1fr; gap: 48px; }
+    #frameworks .frameworks-grid { grid-template-columns: 1fr; }
+    footer { flex-direction: column; gap: 12px; text-align: center; }
+    .contact-links { flex-direction: column; align-items: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+<div class="noise"></div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">R<span>.</span>R</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#frameworks">Frameworks</a></li>
+    <li><a href="#background">Background</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-status">
+    <div class="status-dot"></div>
+    Open to work
+  </div>
+</nav>
+
+<div class="wrapper">
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="corner-tl"></div>
+    <div class="corner-br"></div>
+    <p class="hero-label">Full-Stack Developer</p>
+    <h1 class="hero-name">
+      <span class="line">Rizky</span>
+      <span class="line">Ramadhan</span>
+    </h1>
+    <div class="hero-sub">
+      <p>Coding things that matter — dari browser ke backend, dari pixel ke logika. Self-taught. Relentless. Precise.</p>
+      <div class="hero-line"></div>
+    </div>
+    <div class="hero-scroll">Scroll</div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="section-label" data-num="01">About</div>
+    <h2 class="section-title reveal">Who I Am</h2>
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <p>Nama saya <strong>Rizky Ramadhan</strong> — seorang developer yang membangun dirinya sendiri dari nol. Lulusan SMK, saya tidak menunggu gelar untuk mulai menulis kode yang nyata.</p>
+        <p>Perjalanan saya dimulai dari HTML sederhana, berkembang melalui JavaScript, menyentuh sisi server dengan PHP dan Python, dan sekarang merambah ke ekosistem modern seperti TypeScript, React, dan mobile development.</p>
+        <p>Saya percaya bahwa <strong>kualitas kode adalah cerminan cara berpikir</strong>. Setiap baris yang saya tulis adalah representasi dari logika, konsistensi, dan keinginan untuk terus berkembang.</p>
+        <p>Saat ini saya aktif memperdalam pemahaman di area full-stack development, mobile apps, dan performa web modern.</p>
+      </div>
+      <div class="about-stats reveal">
+        <div class="stat-box">
+          <span class="stat-num" data-count="3">0</span>
+          <span class="stat-label">Mastered Languages</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-num" data-count="4">0</span>
+          <span class="stat-label">Projects</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-num" data-count="2">0</span>
+          <span class="stat-label">Frameworks</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-num" data-count="1">0</span>
+          <span class="stat-label">Current Project</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="section-label" data-num="02">Skills</div>
+    <h2 class="section-title reveal">Technical Arsenal</h2>
+
+    <div class="skills-container reveal">
+
+      <div class="skill-category-label">Frontend Languages</div>
+      <div class="skills-row">
+        <div class="skill-item">
+          <div class="skill-header">
+            <span class="skill-name">HTML</span>
+            <span class="skill-level-tag">Expert</span>
+          </div>
+          <div class="skill-bar-track"><div class="skill-bar-fill" data-w="95"></div></div>
+          <span class="skill-percent">95%</span>
+          <p class="skill-desc">Semantic markup, accessibility, SEO structure, dan pemahaman mendalam tentang DOM architecture.</p>
+        </div>
+        <div class="skill-item">
+          <div class="skill-header">
+            <span class="skill-name">CSS</span>
+            <span class="skill-level-tag">Expert</span>
+          </div>
+          <div class="skill-bar-track"><div class="skill-bar-fill" data-w="90"></div></div>
+          <span class="skill-percent">90%</span>
+          <p class="skill-desc">Flexbox, Grid, animasi CSS, custom properties, responsif design dari mobile hingga desktop.</p>
+        </div>
+        <div class="skill-item">
+          <div class="skill-header">
+            <span class="skill-name">JavaScript</span>
+            <span class="skill-level-tag">Intermediate</span>
+          </div>
+          <div class="skill-bar-track"><div class="skill-bar-fill" data-w="60"></div></div>
+          <span class="skill-percent">60%</span>
+          <p class="skill-desc">ES6+, async/await, DOM manipulation, fetch API, closures, dan event-driven programming.</p>
+        </div>
+        <div class="skill-item">
+          <div class="skill-header">
+            <span class="skill-name">TypeScript</span>
+            <span class="skill-level-tag">Beginner</span>
+          </div>
+          <div class="skill-bar-track"><div class="skill-bar-fill" data-w="40"></div></div>
+          <span class="skill-percent">40%</span>
+          <p class="skill-desc">Static typing, interfaces, generics, dan penggunaan TS dalam proyek React dan Astro.</p>
+        </div>
+      </div>
+
+      <div class="skill-category-label">JSX / TSX</div>
+      <div class="skills-row">
+        <div class="skill-item">
+          <div class="skill-header">
+            <span class="skill-name">JSX</span>
+            <span class="skill-level-tag">Beginner</span>
+          </div>
+          <div class="skill-bar-track"><div class="skill-bar-fill" data-w="30"></div></div>
+          <span class="skill-percent">30%</span>
+          <p class="skill-desc">Component composition, props, state management dasar, dan ekosistem React.</p>
+        </div>
+        <div class="skill-item">
+          <div class="skill-header">
+            <span class="skill-name">TSX</span>
+            <span class="skill-level-tag">Beginner</span>
+          </div>
+          <div class="skill-bar-track"><div class="skill-bar-fill" data-w="30"></div></div>
+          <span class="skill-percent">30%</span>
+          <p class="skill-desc">Typed React components, generic props, dan type-safe event handling dalam proyek modern.</p>
+        </div>
+      </div>
+
+      <div class="skill-category-label">Backend Languages</div>
+      <div class="skills-row">
+        <div class="skill-item">
+          <div class="skill-header">
+            <span class="skill-name">PHP</span>
+            <span class="skill-level-tag">Advanced</span>
+          </div>
+          <div class="skill-bar-track"><div class="skill-bar-fill" data-w="85"></div></div>
+          <span class="skill-percent">85%</span>
+          <p class="skill-desc">OOP PHP, PDO, REST API, server-side rendering, dan integrasi database MySQL.</p>
+        </div>
+        <div class="skill-item">
+          <div class="skill-header">
+            <span class="skill-name">Python</span>
+            <span class="skill-level-tag">Intermediate</span>
+          </div>
+          <div class="skill-bar-track"><div class="skill-bar-fill" data-w="60"></div></div>
+          <span class="skill-percent">60%</span>
+          <p class="skill-desc">Scripting, data manipulation, automation, serta penggunaan dasar dalam web backend.</p>
+        </div>
+        <div class="skill-item">
+          <div class="skill-header">
+            <span class="skill-name">Java</span>
+            <span class="skill-level-tag">Intermediate</span>
+          </div>
+          <div class="skill-bar-track"><div class="skill-bar-fill" data-w="60"></div></div>
+          <span class="skill-percent">60%</span>
+          <p class="skill-desc">OOP fundamentals, collections, dan dasar pemrograman berbasis class yang kuat.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FRAMEWORKS -->
+  <section id="frameworks">
+    <div class="section-label" data-num="03">Frameworks</div>
+    <h2 class="section-title reveal">Tools of Choice</h2>
+    <div class="frameworks-grid reveal">
+
+      <div class="framework-card">
+        <span class="fc-tag">Backend / Full-stack</span>
+        <div class="fc-name">Laravel</div>
+        <p class="fc-desc">Framework PHP yang powerful. Saya menggunakannya untuk membangun aplikasi web full-stack — dari routing dan middleware, hingga Eloquent ORM dan Blade templating. Laravel adalah tulang punggung backend saya.</p>
+        <div class="fc-proficiency">
+          <div class="fc-bar-track"><div class="fc-bar-fill" data-w="90"></div></div>
+          <span class="fc-perc">90%</span>
+        </div>
+      </div>
+
+      <div class="framework-card">
+        <span class="fc-tag">Frontend / Static</span>
+        <div class="fc-name">Astro</div>
+        <p class="fc-desc">Framework modern untuk membangun website yang cepat dengan pendekatan island architecture. Saya menggunakan Astro untuk portfolio, landing page, dan konten-driven websites yang performan.</p>
+        <div class="fc-proficiency">
+          <div class="fc-bar-track"><div class="fc-bar-fill" data-w="60"></div></div>
+          <span class="fc-perc">60%</span>
+        </div>
+      </div>
+
+      <div class="framework-card">
+        <span class="fc-tag">Mobile / Cross-platform</span>
+        <div class="fc-name">React Native</div>
+        <p class="fc-desc">Membangun aplikasi mobile iOS dan Android dengan JavaScript dan React. Dengan React Native, saya bisa menulis satu codebase untuk dua platform sekaligus — efisien dan modern.</p>
+        <div class="fc-proficiency">
+          <div class="fc-bar-track"><div class="fc-bar-fill" data-w="40"></div></div>
+          <span class="fc-perc">40%</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- BACKGROUND -->
+  <section id="background">
+    <div class="section-label" data-num="04">Background</div>
+    <h2 class="section-title reveal">My Path</h2>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-year">Awal — Fondasi</div>
+        <div class="timeline-title">Mengenal Web Development</div>
+        <p class="timeline-body">Semua dimulai dengan rasa ingin tahu. Belajar HTML dan CSS dari nol — memahami bagaimana halaman web bekerja, bagaimana struktur dan tampilan saling berkaitan.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">Berkembang — Logika</div>
+        <div class="timeline-title">JavaScript & Backend PHP</div>
+        <p class="timeline-body">Melompat ke dunia logika dengan JavaScript untuk interaktivitas frontend, dan PHP untuk server-side. Mulai membangun aplikasi web sederhana yang bisa menyimpan dan memproses data secara nyata.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">SMK — Formal</div>
+        <div class="timeline-title">Lulusan SMK</div>
+        <p class="timeline-body">Pendidikan formal di Sekolah Menengah Kejuruan memberikan dasar teknis yang terstruktur. Di sini saya mulai mengeksplorasi Java dan memperdalam konsep OOP secara sistematis.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">Ekspansi — Modern Stack</div>
+        <div class="timeline-title">TypeScript, React, Laravel, Astro</div>
+        <p class="timeline-body">Beralih ke ekosistem modern — TypeScript untuk type safety, JSX/TSX untuk UI component-based, Laravel untuk backend yang terorganisir, dan Astro untuk performa web yang optimal.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">Sekarang — Mobile</div>
+        <div class="timeline-title">React Native & Cross-platform</div>
+        <p class="timeline-body">Ekspansi ke mobile development dengan React Native. Menulis kode yang berjalan di iOS dan Android sekaligus — membuktikan bahwa saya tidak berhenti di satu domain saja.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="section-label" data-num="05">Contact</div>
+    <p style="font-family:'Space Mono',monospace;font-size:11px;color:var(--white-faint);letter-spacing:2px;text-transform:uppercase;">Let's build something together</p>
+    <div class="contact-big">
+      Get <em>In</em><br><em>Touch</em>
+    </div>
+    <div class="contact-links">
+      <a href="mailto:rizkyramadhan@email.com" class="contact-link">
+        Email <span class="arrow">&#8599;</span>
+      </a>
+      <a href="https://github.com/" target="_blank" class="contact-link">
+        GitHub <span class="arrow">&#8599;</span>
+      </a>
+      <a href="https://linkedin.com/" target="_blank" class="contact-link">
+        LinkedIn <span class="arrow">&#8599;</span>
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2024 <span>Rizky Ramadhan</span></p>
+    <p>Full-Stack <span>Developer</span></p>
+  </footer>
+
+</div>
+
+<script>
+  // NAV hide/show on scroll direction
+  let lastScroll = 0;
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    const cur = window.scrollY;
+    navbar.style.transform = (cur > lastScroll && cur > 80) ? 'translateY(-100%)' : 'translateY(0)';
+    lastScroll = cur;
+  });
+
+  // REVEAL observer (handles .reveal, skill bars, fc bars)
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('visible');
+
+      entry.target.querySelectorAll('.skill-bar-fill[data-w]').forEach(bar => {
+        setTimeout(() => { bar.style.width = bar.dataset.w + '%'; }, 200);
+      });
+      entry.target.querySelectorAll('.fc-bar-fill[data-w]').forEach(bar => {
+        setTimeout(() => { bar.style.width = bar.dataset.w + '%'; }, 300);
+      });
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Also observe individual skill items for bar animation
+  const barObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const bar = entry.target.querySelector('.skill-bar-fill');
+      if (bar) setTimeout(() => { bar.style.width = bar.dataset.w + '%'; }, 150);
+      barObserver.unobserve(entry.target);
+    });
+  }, { threshold: 0.3 });
+  document.querySelectorAll('.skill-item').forEach(el => barObserver.observe(el));
+
+  // FC bars observer
+  const fcObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const bar = entry.target.querySelector('.fc-bar-fill');
+      if (bar) setTimeout(() => { bar.style.width = bar.dataset.w + '%'; }, 200);
+      fcObserver.unobserve(entry.target);
+    });
+  }, { threshold: 0.3 });
+  document.querySelectorAll('.framework-card').forEach(el => fcObserver.observe(el));
+
+  // Timeline stagger
+  const tlObserver = new IntersectionObserver(entries => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 130);
+      }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.timeline-item').forEach(el => tlObserver.observe(el));
+
+  // Counter animation
+  const counterObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.querySelectorAll('[data-count]').forEach(el => {
+        const target = parseInt(el.dataset.count);
+        let current = 0;
+        const timer = setInterval(() => {
+          current++;
+          el.textContent = current;
+          if (current >= target) clearInterval(timer);
+        }, 60);
+      });
+      counterObserver.unobserve(entry.target);
+    });
+  }, { threshold: 0.4 });
+  const aboutSection = document.getElementById('about');
+  if (aboutSection) counterObserver.observe(aboutSection);
+
+  // Skill item radial glow mouse tracking
+  document.querySelectorAll('.skill-item').forEach(item => {
+    item.addEventListener('mousemove', e => {
+      const r = item.getBoundingClientRect();
+      item.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%');
+      item.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%');
+    });
+  });
+</script>
+</body>
+</html>
 
